@@ -34,8 +34,6 @@ public class ClockServer {
                     long serverTime = ntpClient.getTime();
                     outputStream.writeLong(serverTime);
                     System.out.println("Server time sent: " + serverTime);
-
-                    socket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

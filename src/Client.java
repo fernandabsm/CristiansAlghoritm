@@ -62,8 +62,10 @@ public class Client {
                 }
             }
 
+            long finalCurrentTime = System.currentTimeMillis() - localTime;
+
             // Adjust final local system time
-            long finalTime = System.currentTimeMillis() + clockDeviation;
+            long finalTime = System.currentTimeMillis() + finalCurrentTime;
             setSystemTime(finalTime);
 
         } catch (IOException e) {
@@ -80,6 +82,7 @@ public class Client {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         int second = calendar.get(Calendar.SECOND);
+        System.out.println("New adjustment: " + new Date(newTime));
         String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
         String command = "sudo date -s '" + dateTime + "'";
         Process process = Runtime.getRuntime().exec(new String[]{"bash", "-c", command});
