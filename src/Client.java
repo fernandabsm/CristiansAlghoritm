@@ -11,7 +11,7 @@ public class Client {
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
     private static final int ADJUSTMENT_INTERVAL = 1000; // 1 second interval between clock adjustments
-    private static final int ADJUSTMENT_STEP = 10000; // 1 second adjustment step
+    private static final int ADJUSTMENT_STEP = 10000; // 10 seconds adjustment step
 
     private Socket socket;
     private DataInputStream inputStream;
