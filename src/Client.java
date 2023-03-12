@@ -41,8 +41,32 @@ public class Client {
 
             System.out.println("Server time received: " + formatter.format(dateServerTime));
             System.out.println("Adjusted time: " + formatter.format(dateAdjustedTime));
+
+//            // Set local system time
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTime(dateAdjustedTime);
+//            int year = calendar.get(Calendar.YEAR);
+//            int month = calendar.get(Calendar.MONTH) + 1;
+//            int day = calendar.get(Calendar.DAY_OF_MONTH);
+//            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//            int minute = calendar.get(Calendar.MINUTE);
+//            int second = calendar.get(Calendar.SECOND);
+//            String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+//            String command = "cmd /c date " + dateTime.substring(0, 10) + " && time " + dateTime.substring(11);
+//            Runtime.getRuntime().exec(command);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void getTimePeriodically() {
+        while (true) {
+            getTime();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -59,10 +83,11 @@ public class Client {
         Client client = new Client();
         String option = "";
         do {
-            System.out.println("If you want to get the correct time, enter 1. If you want to exit, enter 0.");
+            System.out.println("if you want to correct your time only once, enter 1. If you want to run this algorithm every 1 second, enter 2. If you want to quit, enter 0.");
             option = scanner.nextLine();
             switch (option) {
                 case "1" -> client.getTime();
+                case "2" -> client.getTimePeriodically();
                 case "0" -> {
                     System.out.println("Leaving the system...");
                     client.closeConnection();
