@@ -45,7 +45,7 @@ public class Client {
 
             // Set local system time
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(dateAdjustedTime);
+            calendar.setTime(new Date(adjustedTime));
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH) + 1;
             int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -53,8 +53,8 @@ public class Client {
             int minute = calendar.get(Calendar.MINUTE);
             int second = calendar.get(Calendar.SECOND);
             String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
-            String command = "cmd /c date " + dateTime.substring(0, 10) + " && time " + dateTime.substring(11);
-            Runtime.getRuntime().exec(command);
+            String command = "sudo date -s '" + dateTime + "' && sudo timedatectl set-ntp true";
+            Runtime.getRuntime().exec(new String[]{"bash", "-c", command});
         } catch (IOException e) {
             e.printStackTrace();
         }
