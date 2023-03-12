@@ -62,8 +62,9 @@ public class Client {
             }
 
             // Adjust final local system time
-            long finalTime = System.currentTimeMillis() + clockDeviation;
-            setSystemTime(finalTime);
+            // Considering the time used for loop of correction time
+            long finalTime = System.currentTimeMillis();
+            setSystemTime(finalTime + (adjustmentAmount - 1) * ADJUSTMENT_INTERVAL);
 
         } catch (IOException e) {
             e.printStackTrace();
