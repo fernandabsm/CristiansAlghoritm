@@ -3,6 +3,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -42,18 +43,18 @@ public class Client {
             System.out.println("Server time received: " + formatter.format(dateServerTime));
             System.out.println("Adjusted time: " + formatter.format(dateAdjustedTime));
 
-//            // Set local system time
-//            Calendar calendar = Calendar.getInstance();
-//            calendar.setTime(dateAdjustedTime);
-//            int year = calendar.get(Calendar.YEAR);
-//            int month = calendar.get(Calendar.MONTH) + 1;
-//            int day = calendar.get(Calendar.DAY_OF_MONTH);
-//            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-//            int minute = calendar.get(Calendar.MINUTE);
-//            int second = calendar.get(Calendar.SECOND);
-//            String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
-//            String command = "cmd /c date " + dateTime.substring(0, 10) + " && time " + dateTime.substring(11);
-//            Runtime.getRuntime().exec(command);
+            // Set local system time
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dateAdjustedTime);
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH) + 1;
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+            int second = calendar.get(Calendar.SECOND);
+            String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+            String command = "cmd /c date " + dateTime.substring(0, 10) + " && time " + dateTime.substring(11);
+            Runtime.getRuntime().exec(command);
         } catch (IOException e) {
             e.printStackTrace();
         }

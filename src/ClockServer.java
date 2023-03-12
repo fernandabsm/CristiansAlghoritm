@@ -5,7 +5,7 @@ import java.net.*;
 
 public class ClockServer {
 
-    NTPClient ntpClient = new NTPClient("br.pool.ntp.org");
+    NTPClient ntpClient = new NTPClient("br.pool.ntp.org"); // address of ntp server in Brazil
 
     private ServerSocket serverSocket;
 
@@ -30,7 +30,7 @@ public class ClockServer {
                     long clientTime = inputStream.readLong();
                     System.out.println("Client time received: " + clientTime);
 
-                    //long serverTime = System.currentTimeMillis();
+                    // uses the ntpClient do get time from a ntp server
                     long serverTime = ntpClient.getTime();
                     outputStream.writeLong(serverTime);
                     System.out.println("Server time sent: " + serverTime);
