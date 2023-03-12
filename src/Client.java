@@ -11,7 +11,7 @@ public class Client {
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
     private static final int ADJUSTMENT_INTERVAL = 1000; // 1 second interval between clock adjustments
-    private static final int ADJUSTMENT_STEP = 1000; // 1 second adjustment step
+    private static final int ADJUSTMENT_STEP = 10000; // 1 second adjustment step
 
     private Socket socket;
     private DataInputStream inputStream;
@@ -27,7 +27,7 @@ public class Client {
         }
     }
 
-    public void getTime(boolean periodic) {
+    public void getTime() {
         try {
             long clientTime = System.currentTimeMillis();
             outputStream.writeLong(clientTime);
@@ -42,6 +42,7 @@ public class Client {
             // Get current time after receiving response
             long receiveTime = System.currentTimeMillis();
 
+
             // Calculate RTT and clock deviation
             long rtt = receiveTime - clientTime;
             long clockDeviation = (serverTime - (clientTime + rtt/2));
@@ -49,9 +50,11 @@ public class Client {
             // Gradually adjust local system time
             long adjustmentAmount = Math.abs(clockDeviation) / ADJUSTMENT_STEP;
             long adjustmentSign = clockDeviation < 0 ? -1 : 1;
+            long localTime = System.currentTimeMillis();
+
             for (int i = 0; i < adjustmentAmount; i++) {
-                long newTime = System.currentTimeMillis() + (i + 1) * ADJUSTMENT_STEP * adjustmentSign;
-                setSystemTime(newTime);
+                localTime += ADJUSTMENT_STEP * adjustmentSign;
+                setSystemTime(localTime);
                 try {
                     Thread.sleep(ADJUSTMENT_INTERVAL);
                 } catch (InterruptedException e) {
@@ -59,15 +62,10 @@ public class Client {
                 }
             }
 
-            // Set final local system time
-            long currentTime = System.currentTimeMillis() + clockDeviation;
-            setSystemTime(currentTime);
+            // Adjust final local system time
+            long finalTime = System.currentTimeMillis() + clockDeviation;
+            setSystemTime(finalTime);
 
-            if (!periodic) {
-                // Close connection
-                socket.close();
-                System.out.println("Disconnected from server");
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,7 +81,7 @@ public class Client {
         int minute = calendar.get(Calendar.MINUTE);
         int second = calendar.get(Calendar.SECOND);
         String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
-        String command = "sudo date -s '" + dateTime + "' && sudo timedatectl set-ntp true";
+        String command = "sudo date -s '" + dateTime + "'";
         Process process = Runtime.getRuntime().exec(new String[]{"bash", "-c", command});
         try {
             process.waitFor();
@@ -94,7 +92,7 @@ public class Client {
 
     public void getTimePeriodically() {
         while (true) {
-            getTime(true);
+            getTime();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -119,7 +117,7 @@ public class Client {
             System.out.println("if you want to correct your time only once, enter 1. If you want to run this algorithm every 1 second, enter 2. If you want to quit, enter 0.");
             option = scanner.nextLine();
             switch (option) {
-                case "1" -> client.getTime(false);
+                case "1" -> client.getTime();
                 case "2" -> client.getTimePeriodically();
                 case "0" -> {
                     System.out.println("Leaving the system...");
