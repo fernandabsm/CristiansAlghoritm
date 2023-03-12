@@ -83,8 +83,8 @@ public class Client {
         int minute = calendar.get(Calendar.MINUTE);
         int second = calendar.get(Calendar.SECOND);
         String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
-        String command = "sudo date -s \"" + dateTime + "\"";
-        Process process = Runtime.getRuntime().exec(command);
+        String command = "sudo date -s '" + dateTime + "' && sudo timedatectl set-ntp true";
+        Process process = Runtime.getRuntime().exec(new String[]{"bash", "-c", command});
         try {
             process.waitFor();
         } catch (InterruptedException e) {
