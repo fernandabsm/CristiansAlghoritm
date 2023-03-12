@@ -10,6 +10,8 @@ import java.util.Scanner;
 public class Client {
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+    private static final long TIME_ADJUSTMENT = 60000; // 1 minute in milliseconds
+    private static final long INCREMENT = 1000; // 1 second in milliseconds
 
     private Socket socket;
     private DataInputStream inputStream;
@@ -34,28 +36,52 @@ public class Client {
 
             long serverTime = inputStream.readLong();
             long clientReceiveTime = System.currentTimeMillis();
+            // Calculate RTT and clock deviation
             long rtt = clientReceiveTime - clientTime;
-            long adjustedTime = serverTime + rtt / 2;
+            long clockDeviation = (serverTime - (clientTime + rtt/2));
 
-            Date dateServerTime = new Date(serverTime);
-            Date dateAdjustedTime = new Date(adjustedTime);
+            // Get current time with deviation applied
+            long currentTime = System.currentTimeMillis() + clockDeviation;
 
-            System.out.println("Server time received: " + formatter.format(dateServerTime));
-            System.out.println("Adjusted time: " + formatter.format(dateAdjustedTime));
+            // Calculate time adjustment increment
+            long adjustmentIncrement = TIME_ADJUSTMENT / (TIME_ADJUSTMENT / INCREMENT);
 
-            // Set local system time
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date(adjustedTime));
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH) + 1;
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int minute = calendar.get(Calendar.MINUTE);
-            int second = calendar.get(Calendar.SECOND);
-            String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
-            String command = "sudo date -s '" + dateTime + "' && sudo timedatectl set-ntp true";
-            Runtime.getRuntime().exec(new String[]{"bash", "-c", command});
-        } catch (IOException e) {
+            // Gradually adjust local system time
+            long adjustmentRemaining = TIME_ADJUSTMENT;
+            while (adjustmentRemaining > 0) {
+                // Get current time with deviation applied
+                long adjustedTime = System.currentTimeMillis() + clockDeviation;
+
+                // Set local system time
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(new Date(adjustedTime));
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH) + 1;
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                int minute = calendar.get(Calendar.MINUTE);
+                int second = calendar.get(Calendar.SECOND);
+
+                // Get the command to adjust the data/time of the system
+                String dateTime = String.format("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+                String command = "date -s '" + dateTime + "'";
+
+                // Run the command
+                Process process = Runtime.getRuntime().exec(new String[] {"bash", "-c", command});
+                process.waitFor();
+
+                // Wait for increment
+                try {
+                    Thread.sleep(INCREMENT);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                // Update adjustment remaining
+                adjustmentRemaining -= adjustmentIncrement;
+            }
+
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
