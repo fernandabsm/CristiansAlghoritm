@@ -51,6 +51,7 @@ public class Client {
             long adjustmentAmount = Math.abs(clockDeviation) / ADJUSTMENT_STEP;
             long adjustmentSign = clockDeviation < 0 ? -1 : 1;
             long localTime = System.currentTimeMillis();
+            long timeBeforeStartAdjustment = localTime;
 
             for (int i = 0; i < adjustmentAmount; i++) {
                 localTime += ADJUSTMENT_STEP * adjustmentSign;
@@ -62,7 +63,7 @@ public class Client {
                 }
             }
 
-            long finalCurrentTime = System.currentTimeMillis() - localTime;
+            long finalCurrentTime = System.currentTimeMillis() - timeBeforeStartAdjustment;
 
             // Adjust final local system time
             long finalTime = System.currentTimeMillis() + finalCurrentTime;
