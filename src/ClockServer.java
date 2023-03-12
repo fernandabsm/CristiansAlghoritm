@@ -24,16 +24,18 @@ public class ClockServer {
 
             Thread thread = new Thread(() -> {
                 try {
-                    var inputStream = new DataInputStream(socket.getInputStream());
-                    var outputStream = new DataOutputStream(socket.getOutputStream());
+                    while (true) {
+                        var inputStream = new DataInputStream(socket.getInputStream());
+                        var outputStream = new DataOutputStream(socket.getOutputStream());
 
-                    long clientTime = inputStream.readLong();
-                    System.out.println("Client time received: " + clientTime);
+                        long clientTime = inputStream.readLong();
+                        System.out.println("Client time received: " + clientTime);
 
-                    // uses the ntpClient do get time from a ntp server
-                    long serverTime = ntpClient.getTime();
-                    outputStream.writeLong(serverTime);
-                    System.out.println("Server time sent: " + serverTime);
+                        // uses the ntpClient do get time from a ntp server
+                        long serverTime = ntpClient.getTime();
+                        outputStream.writeLong(serverTime);
+                        System.out.println("Server time sent: " + serverTime);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
