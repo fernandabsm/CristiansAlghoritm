@@ -21,13 +21,11 @@ public class ClockServer {
     public void acceptConnections() throws IOException {
         while (true) {
             Socket socket = serverSocket.accept();
-
             Thread thread = new Thread(() -> {
                 try {
+                    var inputStream = new DataInputStream(socket.getInputStream());
+                    var outputStream = new DataOutputStream(socket.getOutputStream());
                     while (true) {
-                        var inputStream = new DataInputStream(socket.getInputStream());
-                        var outputStream = new DataOutputStream(socket.getOutputStream());
-
                         long clientTime = inputStream.readLong();
                         System.out.println("Client time received: " + clientTime);
 
